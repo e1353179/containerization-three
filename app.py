@@ -31,7 +31,7 @@ def estimate_ate():
     beta = model.params['X']          # Spending effect
     p_value_tau = model.pvalues['W']  # Significance of ATE
 
-    # Optional: Save output to file
+    # Save output to file
     with open("output.txt", "w") as f:
         f.write(f"Intercept (α): {alpha:.2f}\n")
         f.write(f"ATE (τ): {tau:.2f}, p-value: {p_value_tau:.4f}\n")
