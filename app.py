@@ -58,14 +58,14 @@ def estimate_ate():
 @app.route("/predict", methods=["GET"])
 def predict_engagement():
     try:
-        # 获取 URL 查询参数，如 /predict?W=1&X=20
+        # Get URL query parameters, e.g., /predict?W=1&X=20
         W = float(request.args.get("W") or request.args.get("w") or 0)
         X_val = float(request.args.get("X") or request.args.get("x") or 0)
 
-        # 加载模型
+        # Load the trained model
         model = joblib.load("model.pkl")
 
-        # 添加截距项
+        # Prepare input vector with intercept
         input_features = np.array([[1, W, X_val]])
         prediction = model.predict(input_features)[0]
 
