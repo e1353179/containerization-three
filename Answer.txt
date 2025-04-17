@@ -1,0 +1,30 @@
+Question 1
+(a)
+Intercept (α): 95.97
+Average Treatment Effect (τ): −9.11
+Spending coefficient (β): 1.51
+
+(b) Estimated ATE and Statistical Significance
+Estimated ATE (τ̂): −9.11
+p-value for τ̂: 0.0004
+This result is statistically significant (p < 0.05), 
+indicating strong evidence that participating in the carbon offset program is associated with a reduction in stakeholder engagement score by approximately 9.11 points, all else being equal.
+
+(c)
+Unconfoundedness (Ignorability):
+Treatment assignment is independent of potential outcomes given sustainability spending.
+Overlap (Positivity):
+For all levels of X, there must be both treated and untreated units.
+Correct model specification:
+The linear model form must be appropriate and include all relevant covariates.
+
+Under these assumptions, τ̂ can be interpreted as the Average Treatment Effect (ATE).
+
+Question 2
+Predict Output:
+{
+  "W": 1.0,
+  "X": 20.0,
+  "predicted_engagement": 117.16
+}
+This means a company participating in the carbon offset program and spending $20,000 on sustainability is predicted to have a stakeholder engagement score of 117.16.
