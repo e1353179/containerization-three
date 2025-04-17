@@ -1,7 +1,8 @@
-from flask import Flask, jsonify
+from flask import Flask, request, jsonify
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
+import joblib
 
 app = Flask(__name__)
 
@@ -16,33 +17,66 @@ data = {
 }
 df = pd.DataFrame(data)
 
+@app.route("/")
+def index():
+    return "Flask app is running. Visit /estimate to calculate ATE or /predict to estimate Ŷ."
+
 @app.route("/estimate")
 def estimate_ate():
-    # Add intercept column to feature matrix
-    X_mat = sm.add_constant(df[['W', 'X']])
-    y = df['Y']
+    try:
+        # Add intercept term
+        X_mat = sm.add_constant(df[['W', 'X']])
+        y = df['Y']
 
-    # Fit the linear regression model
-    model = sm.OLS(y, X_mat).fit()
+        # Fit regression model
+        model = sm.OLS(y, X_mat).fit()
 
-    # Extract estimated parameters
-    alpha = model.params['const']     # Intercept
-    tau = model.params['W']           # ATE
-    beta = model.params['X']          # Spending effect
-    p_value_tau = model.pvalues['W']  # Significance of ATE
+        # Extract parameters
+        alpha = model.params['const']
+        tau = model.params['W']
+        beta = model.params['X']
+        p_value_tau = model.pvalues['W']
 
-    # Save output to file
-    with open("output.txt", "w") as f:
-        f.write(f"Intercept (α): {alpha:.2f}\n")
-        f.write(f"ATE (τ): {tau:.2f}, p-value: {p_value_tau:.4f}\n")
-        f.write(f"Beta (X): {beta:.2f}\n")
+        # Save to file
+        with open("output.txt", "w") as f:
+            f.write(f"Intercept (α): {alpha:.2f}\n")
+            f.write(f"ATE (τ): {tau:.2f}, p-value: {p_value_tau:.4f}\n")
+            f.write(f"Beta (X): {beta:.2f}\n")
 
-    return jsonify({
-        "intercept_alpha": round(alpha, 2),
-        "ATE_tau": round(tau, 2),
-        "p_value_tau": round(p_value_tau, 4),
-        "beta_for_X": round(beta, 2)
-    })
+        # Save model to disk
+        joblib.dump(model, "model.pkl")
+
+        return jsonify({
+            "intercept_alpha": round(alpha, 2),
+            "ATE_tau": round(tau, 2),
+            "p_value_tau": round(p_value_tau, 4),
+            "beta_for_X": round(beta, 2)
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/predict", methods=["POST"])
+def predict_engagement():
+    try:
+        # Parse input
+        data = request.get_json()
+        W = float(data.get("W", 0))
+        X_val = float(data.get("X", 0))
+
+        # Load model
+        model = joblib.load("model.pkl")
+
+        # Predict
+        input_features = np.array([[1, W, X_val]])
+        prediction = model.predict(input_features)[0]
+
+        return jsonify({
+            "W": W,
+            "X": X_val,
+            "predicted_engagement": round(prediction, 2)
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
