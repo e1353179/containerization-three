@@ -55,18 +55,17 @@ def estimate_ate():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route("/predict", methods=["POST"])
+@app.route("/predict", methods=["GET"])
 def predict_engagement():
     try:
-        # Parse input
-        data = request.get_json()
-        W = float(data.get("W", 0))
-        X_val = float(data.get("X", 0))
+        # 获取 URL 查询参数，如 /predict?W=1&X=20
+        W = float(request.args.get("W", 0))
+        X_val = float(request.args.get("X", 0))
 
-        # Load model
+        # 加载模型
         model = joblib.load("model.pkl")
 
-        # Predict
+        # 添加截距项
         input_features = np.array([[1, W, X_val]])
         prediction = model.predict(input_features)[0]
 
