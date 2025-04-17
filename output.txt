@@ -1,1 +1,3 @@
-
+Intercept (α): 95.97
+ATE (τ): -9.11, p-value: 0.0004
+Beta (X): 1.51
