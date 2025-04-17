@@ -59,8 +59,8 @@ def estimate_ate():
 def predict_engagement():
     try:
         # 获取 URL 查询参数，如 /predict?W=1&X=20
-        W = float(request.args.get("W", 0))
-        X_val = float(request.args.get("X", 0))
+        W = float(request.args.get("W") or request.args.get("w") or 0)
+        X_val = float(request.args.get("X") or request.args.get("x") or 0)
 
         # 加载模型
         model = joblib.load("model.pkl")

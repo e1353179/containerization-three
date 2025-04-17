@@ -28,7 +28,9 @@ Also writes results to output.txt and saves the model as model.pkl.
 
 1. **Start your container** (if not already running):
    ```bash
-   docker run -p 5000:5000 -v $(pwd):/app causal-api
+   docker build -t my-api .
+
+   docker run -p 5000:5000 my-api
 
 2. **Call the /estimate endpoint** (via curl or browser)
     ```bash
